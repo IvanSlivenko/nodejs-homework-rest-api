@@ -3,12 +3,13 @@ const express = require('express')
 const contactsService = require("../../models/contacts");
 
 const router = express.Router()
-
+// маршрут get "/"
 router.get('/', async (req, res, next) => {
   const result = await contactsService.listContacts(); 
   res.json(result);
 })
 
+// маршрут get  "/:contactId"
 router.get('/:contactId', async (req, res, next) => {
   const contact = await contactsService.getContactById()
   res.json(contact);
@@ -24,9 +25,9 @@ router.delete('/:contactId', async (req, res, next) => {
   res.json(removeContact);
 })
 
-router.put('/:contactId', async (req, res, next) => {
+// router.put('/:contactId', async (req, res, next) => {
   
-  res.json({ message: 'template message' })
-})
+//   res.json({ message: 'template message' })
+// })
 
 module.exports = router
