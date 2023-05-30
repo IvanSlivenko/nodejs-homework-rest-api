@@ -1,9 +1,15 @@
 const express = require("express");
+const Joi = require("joi");
+
 
 const moviesService = require("../../models/movies");
 const {HttpError} = require("../../helpers");
 
 const router = express.Router();
+
+const movieAddSchema = Joi.object({
+  
+});
 
 // маршрут  get "/"
 router.get("/", async (req, res, next) => {
@@ -27,20 +33,20 @@ router.get('/:id', async (req, res, next) => {
         const { id } = req.params;
         const movie = await moviesService.getMovieById(id);
 
-        if (!movie) {
-          // Error Варіант 1
-          //   return res.status(404).json({
-          //     message: "Not Found",
-          //   });
+      if (!movie) {
+        // Error Варіант 3
+        throw HttpError(404,`Movie with ${id} not found`);
+        
+        // Error Варіант 1
+        //   return res.status(404).json({
+        //     message: "Not Found",
+        //   });
 
-          // Error Варіант 2
-          //  const error = new Error("Not Found");
-          //  error.statusCode = 404;
-          // throw error;
-
-          // Error Варіант 2
-          throw HttpError(404, "Not Fond");
-        }
+        // Error Варіант 2
+        //  const error = new Error("Not Found");
+        //  error.statusCode = 404;
+        // throw error;
+      }
 
         res.json(movie);
     }
@@ -56,4 +62,19 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
+router.post("/", async (req, res) => { 
+  try {
+    // console.log(req.body);
+    const result = await moviesService.addMovie(req.body);
+    res.status(201).json(result);
+  }
+  catch (error) { 
+    next(error);
+  }
+
+});
+
 module.exports = router;
+
+
+
