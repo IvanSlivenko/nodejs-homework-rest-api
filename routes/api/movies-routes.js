@@ -2,7 +2,7 @@ const express = require("express");
 const Joi = require("joi");
 
 
-const moviesService = require("../../models/movies");
+const moviesService = require("../../models/movies/index");
 const {HttpError} = require("../../helpers");
 
 const router = express.Router();
@@ -31,16 +31,16 @@ router.get("/", async (req, res, next) => {
     }
 });
 
-// маршрут get  "/:Id"
+// Шукаємо
 router.get('/:id', async (req, res, next) => { 
     try {
         const { id } = req.params;
-        const movie = await moviesService.getMovieById(id);
+        const result = await moviesService.getMovieById(id);
 
-      if (!movie) {
+      if (!result) {
         // Error Варіант 3
-        throw HttpError(404,`Movie with ${id} not found`);
-        
+        throw HttpError(404, `Movie with ${id} not found`);
+
         // Error Варіант 1
         //   return res.status(404).json({
         //     message: "Not Found",
@@ -52,7 +52,7 @@ router.get('/:id', async (req, res, next) => {
         // throw error;
       }
 
-        res.json(movie);
+        res.json(result);
     }
     catch (error) {
       // Варіант № 1
@@ -66,6 +66,7 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
+// Додаємо 
 router.post("/", async (req, res, next) => { 
   try {
  
@@ -82,6 +83,7 @@ router.post("/", async (req, res, next) => {
 
 });
 
+// Змінюємо
 router.put("/:id", async (req, res, next) => {
   try { 
     // первіряємо тіло запиту
@@ -90,12 +92,36 @@ if (error) {
   throw HttpError(400, error.message);
     }
     const { id } = req.params;
-   const result = await moviesService.getMovieById(id,req.body); 
+    const result = await moviesService.updateMovieById(id, req.body); 
+    if (!result) {
+      throw HttpError(404, `Movie with ${id} not found`);
+    }
+    res.json(result);
+
   }
   catch (error) { 
     next(error);
   }
- });
+});
+ 
+// Видаляємо
+router.delete("/:id", async (req, res, next) => { 
+  try { 
+    const { id } = req.params;
+    const result = await moviesService.deleteById(id);
+    if (!result) {
+      throw HttpError(404, `Movie with ${id} not found`);
+    }
+    res.status(204).send()
+    res.json({
+      message: "Delete success"
+    })
+
+  }
+  catch(error){
+    next(error);
+   }
+})
 
 module.exports = router;
 
